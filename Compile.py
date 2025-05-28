@@ -30,8 +30,7 @@ def compile(g):
             continue
         elif model == 'MISMATCH':
             print(f'Error in compiling -> MISMATCH: "{value}"')
-            return [] 
+            return []
         grammers.append((model, value))
     grammers.append(('EOF', '$'))
     return grammers
-

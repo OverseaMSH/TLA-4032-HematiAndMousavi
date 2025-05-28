@@ -29,7 +29,9 @@ def compile(g):
         if model == 'SKIP':
             continue
         elif model == 'MISMATCH':
-            raise RuntimeError(f'Unexpected character: {value}')
+            print(f'Error in compiling -> MISMATCH: "{value}"')
+            return [] 
         grammers.append((model, value))
     grammers.append(('EOF', '$'))
     return grammers
+

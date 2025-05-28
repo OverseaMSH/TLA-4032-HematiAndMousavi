@@ -1,5 +1,5 @@
 from Compile import compile
-code = """x = sin(2.5) + y^2 - 3 /cccc z\
+code = """x = sin(2.5) + y^2 - 3 /{cccc z\
     
     
 """

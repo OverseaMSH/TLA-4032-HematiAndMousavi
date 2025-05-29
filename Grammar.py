@@ -1,67 +1,36 @@
-"""
-GRAMMAR:
+class Grammar:
+    def __init__(self):
+        self.non_terminals = set()
+        self.terminals = set()
+        self.start_symbol = None
+        self.productions = {}  # dict of {Non-terminal: list of productions}
 
-E  -> T E'
-E' -> PLUS T E' | MINUS T E' | ε
-T  -> F T'
-T' -> STAR F T' | DIV F T' | ε
-F  -> P F'
-F' -> POW P F' | ε
-P  -> LEFT_PAR E RIGHT_PAR | IDENTIFIER | LITERAL
-"""
+    def load_from_file(self, filename):
+        with open(filename, 'r') as file:
+            for line in file:
+                if '->' not in line:
+                    continue
+                head, body = line.strip().split('->')
+                head = head.strip()
+                bodies = [b.strip().split() for b in body.strip().split('|')]
 
-GRAMMAR = {
-    'E': [['T', "E'"]],
-    "E'": [['PLUS', 'T', "E'"], ['MINUS', 'T', "E'"], ['ε']],
-    'T': [['F', "T'"]],
-    "T'": [['STAR', 'F', "T'"], ['DIV', 'F', "T'"], ['ε']],
-    'F': [['P', "F'"]],
-    "F'": [['POW', 'P', "F'"], ['ε']],
-    'P': [['LEFT_PAR', 'E', 'RIGHT_PAR'], ['IDENTIFIER'], ['LITERAL']],
-}
+                if self.start_symbol is None:
+                    self.start_symbol = head
 
-FIRST = {
-    'E': {'LEFT_PAR', 'IDENTIFIER', 'LITERAL'},
-    "E'": {'PLUS', 'MINUS', 'ε'},
-    'T': {'LEFT_PAR', 'IDENTIFIER', 'LITERAL'},
-    "T'": {'STAR', 'DIV', 'ε'},
-    'F': {'LEFT_PAR', 'IDENTIFIER', 'LITERAL'},
-    "F'": {'POW', 'ε'},
-    'P': {'LEFT_PAR', 'IDENTIFIER', 'LITERAL'},
-}
+                self.non_terminals.add(head)
+                self.productions.setdefault(head, []).extend(bodies)
 
-FOLLOW = {
-    'E': {'RIGHT_PAR', 'EOF'},
-    "E'": {'RIGHT_PAR', 'EOF'},
-    'T': {'PLUS', 'MINUS', 'RIGHT_PAR', 'EOF'},
-    "T'": {'PLUS', 'MINUS', 'RIGHT_PAR', 'EOF'},
-    'F': {'STAR', 'DIV', 'PLUS', 'MINUS', 'RIGHT_PAR', 'EOF'},
-    "F'": {'STAR', 'DIV', 'PLUS', 'MINUS', 'RIGHT_PAR', 'EOF'},
-    'P': {'POW', 'STAR', 'DIV', 'PLUS', 'MINUS', 'RIGHT_PAR', 'EOF'},
-}
+        # استخراج ترمینال‌ها از تولیدها
+        for rhs_list in self.productions.values():
+            for rhs in rhs_list:
+                for symbol in rhs:
+                    if symbol != 'ε' and symbol not in self.productions:
+                        self.terminals.add(symbol)
 
-
-def build_ll1_table(grammar, first, follow):
-    table = {}
-    for nt in grammar:
-        for prod in grammar[nt]:
-            first_set = set()
-            if prod[0] == 'ε':
-                first_set = {'ε'}
-            else:
-                for symbol in prod:
-                    if symbol in first:
-                        first_set |= (first[symbol] - {'ε'})
-                        if 'ε' not in first[symbol]:
-                            break
-                    else:
-                        first_set.add(symbol)
-                        break
-                else:
-                    first_set.add('ε')
-            for terminal in first_set - {'ε'}:
-                table.setdefault(nt, {})[terminal] = prod
-            if 'ε' in first_set:
-                for terminal in follow[nt]:
-                    table.setdefault(nt, {})[terminal] = prod
-    return table
+    def display(self):
+        print("Start Symbol:", self.start_symbol)
+        print("Non-terminals:", self.non_terminals)
+        print("Terminals:", self.terminals)
+        print("Productions:")
+        for head, bodies in self.productions.items():
+            print(f"  {head} -> {' | '.join([' '.join(prod) for prod in bodies])}")

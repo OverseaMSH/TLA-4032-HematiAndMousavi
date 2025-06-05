@@ -1,3 +1,4 @@
+# Final Project of Theory of Languages and Automata 
 # LL(1) Grammar Parser Project
 
 This project is a final assignment for the *Theory of Machines and Languages* course, Spring 1404 (2025), by Mohammadjavad Jalilvand and Hossein Babazadeh. The goal is to implement a simple compiler component that parses input using LL(1) grammars and builds a parse tree using a Deterministic Pushdown Automaton (DPDA).
@@ -132,6 +133,6 @@ Factor → ID | NUM | (Expression)
 
 Spring 1404 / 2025
 Department of Computer Engineering
-Iran University of Science and Technology
+[Iran University of Science and Technology](https://www.iust.ac.ir/en)
 
 

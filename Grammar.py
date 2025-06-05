@@ -6,11 +6,15 @@ class Grammar:
         self.productions = {}  # dict of {Non-terminal: list of productions}
 
     def load_from_file(self, filename):
-        with open(filename, 'r') as file:
+        with open(filename, 'r', encoding='utf-8') as file:
             for line in file:
+                line = line.strip()
+                # جایگزینی کاراکتر نادرست «Îµ» (اگر وجود داشت) با «ε»
+                line = line.replace('Îµ', 'ε')
+
                 if '->' not in line:
                     continue
-                head, body = line.strip().split('->')
+                head, body = line.split('->')
                 head = head.strip()
                 bodies = [b.strip().split() for b in body.strip().split('|')]
 
@@ -20,11 +24,15 @@ class Grammar:
                 self.non_terminals.add(head)
                 self.productions.setdefault(head, []).extend(bodies)
 
-        # استخراج ترمینال‌ها از تولیدها
+        # استخراجِ ترمینال‌ها از تولیدها
         for rhs_list in self.productions.values():
             for rhs in rhs_list:
                 for symbol in rhs:
-                    if symbol != 'ε' and symbol not in self.productions:
+                    # اگر سمبل ε باشد، حتماً آن را نادیده می‌گیریم
+                    if symbol == 'ε':
+                        continue
+                    # اگر سمبل در لیست کلیدهای productions نیست، ترمینال است
+                    if symbol not in self.productions:
                         self.terminals.add(symbol)
 
     def display(self):
